@@ -95,55 +95,55 @@ public class FormWebUiAuthenticationFilter
     @Override
     public void filter(ContainerRequestContext request)
     {
-        String path = request.getUriInfo().getRequestUri().getPath();
-
-        // disabled page is always visible
-        if (path.equals(DISABLED_LOCATION)) {
-            return;
-        }
-
-        // authenticator over a secure connection bypasses the form login
-        if (authenticator.isPresent() && request.getSecurityContext().isSecure()) {
-            handleProtocolLoginRequest(authenticator.get(), request);
-            return;
-        }
-
-        // login and logout resource is not visible to protocol authenticators
-        if ((path.equals(UI_LOGIN) && request.getMethod().equals("POST")) || path.equals(UI_LOGOUT)) {
-            return;
-        }
-
-        // check if the user is already authenticated
-        Optional<String> username = getAuthenticatedUsername(request);
-        if (username.isPresent()) {
-            // if the authenticated user is requesting the login page, send them directly to the ui
-            if (path.equals(LOGIN_FORM)) {
-                request.abortWith(redirectFromSuccessfulLoginResponse(request.getUriInfo().getRequestUri().getQuery()).build());
-                return;
-            }
-            setAuthenticatedIdentity(request, username.get());
-            return;
-        }
-
-        // send 401 to REST api calls and redirect to others
-        if (path.startsWith("/ui/api/")) {
-            sendWwwAuthenticate(request, "Unauthorized", ImmutableSet.of(TRINO_FORM_LOGIN));
-            return;
-        }
-
-        if (!isAuthenticationEnabled(request.getSecurityContext().isSecure())) {
-            request.abortWith(Response.seeOther(DISABLED_LOCATION_URI).build());
-            return;
-        }
-
-        if (path.equals(LOGIN_FORM)) {
-            return;
-        }
-
-        // redirect to login page
-        request.abortWith(Response.seeOther(LOGIN_FORM_URI).build());
-
-        request.abortWith(Response.seeOther(buildLoginFormURI(request.getUriInfo())).build());
+//        String path = request.getUriInfo().getRequestUri().getPath();
+//
+//        // disabled page is always visible
+//        if (path.equals(DISABLED_LOCATION)) {
+//            return;
+//        }
+//
+//        // authenticator over a secure connection bypasses the form login
+//        if (authenticator.isPresent() && request.getSecurityContext().isSecure()) {
+//            handleProtocolLoginRequest(authenticator.get(), request);
+//            return;
+//        }
+//
+//        // login and logout resource is not visible to protocol authenticators
+//        if ((path.equals(UI_LOGIN) && request.getMethod().equals("POST")) || path.equals(UI_LOGOUT)) {
+//            return;
+//        }
+//
+//        // check if the user is already authenticated
+//        Optional<String> username = getAuthenticatedUsername(request);
+//        if (username.isPresent()) {
+//            // if the authenticated user is requesting the login page, send them directly to the ui
+//            if (path.equals(LOGIN_FORM)) {
+//                request.abortWith(redirectFromSuccessfulLoginResponse(request.getUriInfo().getRequestUri().getQuery()).build());
+//                return;
+//            }
+//            setAuthenticatedIdentity(request, username.get());
+//            return;
+//        }
+//
+//        // send 401 to REST api calls and redirect to others
+//        if (path.startsWith("/ui/api/")) {
+//            sendWwwAuthenticate(request, "Unauthorized", ImmutableSet.of(TRINO_FORM_LOGIN));
+//            return;
+//        }
+//
+//        if (!isAuthenticationEnabled(request.getSecurityContext().isSecure())) {
+//            request.abortWith(Response.seeOther(DISABLED_LOCATION_URI).build());
+//            return;
+//        }
+//
+//        if (path.equals(LOGIN_FORM)) {
+//            return;
+//        }
+//
+//        // redirect to login page
+//        request.abortWith(Response.seeOther(LOGIN_FORM_URI).build());
+//
+//        request.abortWith(Response.seeOther(buildLoginFormURI(request.getUriInfo())).build());
     }
 
     private static URI buildLoginFormURI(UriInfo uriInfo)
