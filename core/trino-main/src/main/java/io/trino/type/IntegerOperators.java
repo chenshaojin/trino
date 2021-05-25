@@ -77,11 +77,11 @@ public final class IntegerOperators
     }
 
     @ScalarOperator(DIVIDE)
-    @SqlType(StandardTypes.INTEGER)
-    public static long divide(@SqlType(StandardTypes.INTEGER) long left, @SqlType(StandardTypes.INTEGER) long right)
+    @SqlType(StandardTypes.DOUBLE)
+    public static double divide(@SqlType(StandardTypes.INTEGER) long left, @SqlType(StandardTypes.INTEGER) long right)
     {
         try {
-            return left / right;
+            return (double) left / right;
         }
         catch (ArithmeticException e) {
             throw new TrinoException(DIVISION_BY_ZERO, "Division by zero", e);

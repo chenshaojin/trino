@@ -14,6 +14,7 @@
 package io.trino.plugin.hive.util;
 
 import com.google.common.collect.AbstractIterator;
+import io.airlift.log.Logger;
 import io.airlift.stats.TimeStat;
 import io.trino.plugin.hive.DirectoryLister;
 import io.trino.plugin.hive.NamenodeStats;
@@ -31,13 +32,14 @@ import java.util.Deque;
 import java.util.Iterator;
 
 import static io.trino.plugin.hive.HiveErrorCode.HIVE_FILESYSTEM_ERROR;
-import static io.trino.plugin.hive.HiveErrorCode.HIVE_FILE_NOT_FOUND;
 import static java.util.Collections.emptyIterator;
 import static java.util.Objects.requireNonNull;
 
 public class HiveFileIterator
         extends AbstractIterator<LocatedFileStatus>
 {
+    private static final Logger log = Logger.get(HiveFileIterator.class);
+
     public enum NestedDirectoryPolicy
     {
         IGNORED,
@@ -180,7 +182,8 @@ public class HiveFileIterator
         {
             namenodeStats.getRemoteIteratorNext().recordException(exception);
             if (exception instanceof FileNotFoundException) {
-                return new TrinoException(HIVE_FILE_NOT_FOUND, "Partition location does not exist: " + path);
+                log.warn("Partition location does not exist: " + path);
+//                return new TrinoException(HIVE_FILE_NOT_FOUND, "Partition location does not exist: " + path);
             }
             return new TrinoException(HIVE_FILESYSTEM_ERROR, "Failed to list directory: " + path, exception);
         }
